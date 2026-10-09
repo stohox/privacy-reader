@@ -1,4 +1,5 @@
 import { globalShortcut, BrowserWindow, Tray, Menu, nativeImage, app } from 'electron'
+import path from 'path'
 import { loadSettings, saveSettings } from './settings'
 import { cancelAllAi } from './ai'
 import { hasPin, verifyPin, setPin as savePin, resetPin as clearPin } from './crypto'
@@ -118,16 +119,29 @@ export function pingActivity(): void {
 // ---------------- 托盘 ----------------
 export function createTray(win: BrowserWindow, onShow: () => void): void {
   if (tray) return
-  // 16x16 单色图标：纯色位图，避免捆绑图片资源
-  const size = 16
-  const bmp = Buffer.alloc(size * size * 4)
-  for (let i = 0; i < size * size; i++) {
-    bmp[i * 4] = 0x60
-    bmp[i * 4 + 1] = 0x60
-    bmp[i * 4 + 2] = 0x60
-    bmp[i * 4 + 3] = 0xff
+  // 优先用应用图标（书本）；打包后从 resources 目录取，开发态从项目 resources 取。
+  // 找不到时回退到 16x16 纯色位图，保证托盘始终有图标不空白。
+  let img: Electron.NativeImage | null = null
+  try {
+    const iconPath = app.isPackaged
+      ? path.join(process.resourcesPath, 'tray.png')
+      : path.join(app.getAppPath(), 'resources', 'tray.png')
+    const loaded = nativeImage.createFromPath(iconPath)
+    if (!loaded.isEmpty()) img = loaded
+  } catch {
+    /* 资源缺失，走回退 */
   }
-  const img = nativeImage.createFromBitmap(bmp, { width: size, height: size })
+  if (!img) {
+    const size = 16
+    const bmp = Buffer.alloc(size * size * 4)
+    for (let i = 0; i < size * size; i++) {
+      bmp[i * 4] = 0x60
+      bmp[i * 4 + 1] = 0x60
+      bmp[i * 4 + 2] = 0x60
+      bmp[i * 4 + 3] = 0xff
+    }
+    img = nativeImage.createFromBitmap(bmp, { width: size, height: size })
+  }
   tray = new Tray(img)
   tray.setToolTip(loadSettings().neutralTitle || '阅读器') // 通用文案，不含书名
   tray.setContextMenu(

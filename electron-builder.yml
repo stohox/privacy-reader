@@ -25,6 +25,13 @@ asarUnpack:
   - "**/*.wasm"
   - "node_modules/sql.js/dist/**"
 
+# 托盘图标随包发布到 resources 目录（打包后 process.resourcesPath/tray.png）
+extraResources:
+  - from: resources/tray.png
+    to: tray.png
+  - from: resources/tray@2x.png
+    to: tray@2x.png
+
 # 无原生模块，跳过 node-gyp 重建
 npmRebuild: false
 
