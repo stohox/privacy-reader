@@ -40,10 +40,10 @@ win:
   target:
     - portable
     - nsis
-  artifactName: ${productName}-便携版-${version}.${ext}
+  artifactName: FushengGuanzhi-portable-${version}.${ext}
 
 portable:
-  artifactName: ${productName}-便携版-${version}.${ext}
+  artifactName: FushengGuanzhi-portable-${version}.${ext}
   requestExecutionLevel: user
 
 nsis:
@@ -54,4 +54,4 @@ nsis:
   createDesktopShortcut: true
   createStartMenuShortcut: true
   shortcutName: 浮生观止
-  artifactName: ${productName}-安装版-${version}.${ext}
+  artifactName: FushengGuanzhi-setup-${version}.${ext}
