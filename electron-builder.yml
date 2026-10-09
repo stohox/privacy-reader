@@ -1,0 +1,50 @@
+appId: com.leo.privacy-reader
+productName: 浮生观止
+copyright: Copyright © 2026 leo
+
+directories:
+  output: dist
+  buildResources: build
+
+# 只打进产物与生产依赖，剔除源码/构建脚本/配置
+files:
+  - out/**
+  - "!**/{.vscode,.idea}/**"
+  - "!src/**"
+  - "!scripts/**"
+  - "!samples/**"
+  - "!build/**"
+  - "!dist/**"
+  - "!electron.vite.config.{js,ts,mjs,cjs}"
+  - "!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}"
+  - "!{.npmrc,.gitignore,README.md,package-lock.json}"
+  - "!**/{test,tests,__tests__,example,examples,docs}/**"
+
+# sql.js 运行时要从磁盘读 sql-wasm.wasm，解包到 app.asar.unpacked 才能被 fs 正常读取
+asarUnpack:
+  - "**/*.wasm"
+  - "node_modules/sql.js/dist/**"
+
+# 无原生模块，跳过 node-gyp 重建
+npmRebuild: false
+
+win:
+  icon: build/icon.ico
+  target:
+    - portable
+    - nsis
+  artifactName: ${productName}-便携版-${version}.${ext}
+
+portable:
+  artifactName: ${productName}-便携版-${version}.${ext}
+  requestExecutionLevel: user
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowElevation: true
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: 浮生观止
+  artifactName: ${productName}-安装版-${version}.${ext}

@@ -1,0 +1,68 @@
+name: Build Windows App
+
+on:
+  # 推 v* 标签时自动打包并发布到 GitHub Release（别人就能在 Release 页下载 exe）
+  push:
+    tags:
+      - 'v*'
+  # 也允许在 Actions 页面手动触发（产物作为 artifact 下载，不发 Release）
+  workflow_dispatch:
+  # 每个 PR / 主干推送都跑一次构建做冒烟，产物挂到该次运行记录上
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build app + package Windows targets
+        env:
+          # 无代码签名证书，关闭自动签名发现
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: npm run dist:win
+
+      - name: Collect artifacts
+        id: collect
+        shell: pwsh
+        run: |
+          $files = Get-ChildItem -Path dist -Include *.exe,*.blockmap,*.yml -Recurse | Where-Object { $_.Name -notlike '__*' }
+          $paths = $files | ForEach-Object { $_.FullName }
+          $paths -join "`n" | Out-File -FilePath release-files.txt -Encoding utf8
+          Write-Host ("Found " + $files.Count + " release file(s)")
+
+      - name: Upload build artifacts (per-run download)
+        uses: actions/upload-artifact@v4
+        with:
+          name: privacy-reader-windows-${{ github.sha }}
+          path: |
+            dist/*.exe
+            dist/*.blockmap
+            dist/latest.yml
+
+      # 仅当是打标签（v*）触发时，创建/更新 GitHub Release 并上传 exe 作为下载资产
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            dist/*.exe
+            dist/*.blockmap
+            dist/latest.yml

@@ -1,0 +1,34 @@
+# 依赖
+node_modules/
+
+# 构建产物（npm run build / electron-builder 会重新生成）
+out/
+dist/
+*.asar
+
+# 打包资源里的中间大图（保留 icon.ico，PNG 由 scripts/apply-icon.ps1 再生）
+build/*.png
+
+# 用户提供的原始图标导出（构建输入，非源码）
+export/
+export.zip
+
+# 运行时数据（正常在 %APPDATA%，万一落到项目目录也绝不提交）
+reader.db
+settings.json
+secrets.json
+master.key
+pin.json
+*.log
+
+# 环境与密钥
+.env
+.env.*
+*.pem
+id_rsa*
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
