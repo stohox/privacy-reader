@@ -12,8 +12,8 @@
     "start": "electron-vite preview",
     "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
     "icon": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/apply-icon.ps1",
-    "dist": "npm run build && electron-builder",
-    "dist:win": "npm run build && electron-builder --win"
+    "dist": "npm run build && electron-builder --publish never",
+    "dist:win": "npm run build && electron-builder --win --publish never"
   },
   "dependencies": {
     "fflate": "^0.8.2",
