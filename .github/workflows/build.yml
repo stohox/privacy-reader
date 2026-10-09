@@ -1,17 +1,16 @@
 name: Build Windows App
 
 on:
-  # 推 v* 标签时自动打包并发布到 GitHub Release（别人就能在 Release 页下载 exe）
+  # 推 main 分支做冒烟构建；推 v* 标签时自动打包并发布到 GitHub Release（别人就能在 Release 页下载 exe）
   push:
+    branches:
+      - main
     tags:
       - 'v*'
   # 也允许在 Actions 页面手动触发（产物作为 artifact 下载，不发 Release）
   workflow_dispatch:
-  # 每个 PR / 主干推送都跑一次构建做冒烟，产物挂到该次运行记录上
+  # 每个 PR 都跑一次构建做冒烟，产物挂到该次运行记录上
   pull_request:
-  push:
-    branches:
-      - main
 
 permissions:
   contents: write
